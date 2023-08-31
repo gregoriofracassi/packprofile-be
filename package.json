@@ -1,0 +1,33 @@
+{
+	"name": "packprofile-be",
+	"version": "1.0.0",
+	"description": "",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"dev": "nodemon -e js -r dotenv/config ./src/index.js",
+		"start": "node ./src/index.js"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"bcrypt": "^5.1.1",
+		"cloudinary": "^1.40.0",
+		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"express": "^4.18.2",
+		"express-list-endpoints": "^6.0.0",
+		"express-validator": "^7.0.1",
+		"http-errors": "^2.0.0",
+		"jsonwebtoken": "^9.0.2",
+		"mongoose": "^7.5.0",
+		"multer": "^1.4.5-lts.1",
+		"multer-storage-cloudinary": "^4.0.0",
+		"validator": "^13.11.0"
+	},
+	"devDependencies": {
+		"dotenv": "^10.0.0",
+		"nodemon": "^2.0.14"
+	}
+}
