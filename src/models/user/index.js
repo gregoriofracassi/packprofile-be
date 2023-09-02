@@ -2,11 +2,11 @@ import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 
 const UserSchema = new mongoose.Schema({
-	firstname: {
+	firstName: {
 		type: String,
 		required: true,
 	},
-	lastname: {
+	lastName: {
 		type: String,
 		required: true,
 	},
@@ -16,7 +16,6 @@ const UserSchema = new mongoose.Schema({
 	},
 	handle: {
 		type: String,
-		required: true,
 	},
 	bio: {
 		type: String,
@@ -29,22 +28,22 @@ const UserSchema = new mongoose.Schema({
 		type: String,
 		default: 'https://image.flaticon.com/icons/png/512/5173/5173555.png',
 	},
+   backgroundImg: {
+      type: String,
+   },
 	fullTime: {
 		type: Boolean,
 		default: true,
 	},
 	position: {
 		type: String,
-		required: true,
 	},
 	company: {
 		type: String,
-		required: true,
 	},
 	skills: [
 		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Skill',
+			type: String,
 		},
 	],
 })

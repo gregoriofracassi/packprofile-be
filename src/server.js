@@ -1,6 +1,7 @@
 import cors from 'cors'
 import express from 'express'
 import usersRouter from './routers/users/index.js'
+import skillsRouter from './routers/skills/index.js'
 import {
 	badRequestErrorHandler,
 	notFoundErrorHandler,
@@ -28,6 +29,7 @@ server.use(cors(corsOptions))
 server.use(express.json())
 
 server.use('/users', usersRouter)
+server.use('/skills', skillsRouter)
 
 server.use(badRequestErrorHandler)
 server.use(notFoundErrorHandler)
