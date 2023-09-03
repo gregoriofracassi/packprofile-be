@@ -71,7 +71,7 @@ usersRouter.get('/', JWTAuthMiddleware, async (req, res, next) => {
 	}
 })
 
-usersRouter.get('/me', async (req, res, next) => {
+usersRouter.get('/me', JWTAuthMiddleware, async (req, res, next) => {
 	try {
 		const user = await UserModel.findById(req.user._id)
 		if (!user) next(createError(404, `ID ${req.params.id} was not found`))
