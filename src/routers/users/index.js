@@ -19,7 +19,6 @@ usersRouter.post('/login', async (req, res, next) => {
 			const accessToken = await JWTAuthenticate(user)
 			res.cookie('accessToken', accessToken, {
 				httpOnly: true,
-				sameSite: 'strict',
 				maxAge: 3600000,
 			})
 
@@ -36,7 +35,6 @@ usersRouter.post('/logout', async (req, res, next) => {
 	try {
 		res.clearCookie('accessToken', {
 			httpOnly: true,
-			sameSite: 'strict',
 		})
 
 		res.status(200).send({ message: 'Successfully logged out' })
