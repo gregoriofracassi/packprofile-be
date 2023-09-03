@@ -20,6 +20,8 @@ usersRouter.post('/login', async (req, res, next) => {
 			res.cookie('accessToken', accessToken, {
 				httpOnly: true,
 				maxAge: 3600000,
+            secure: true,
+            sameSite: 'None'
 			})
 
 			res.send({ user })
