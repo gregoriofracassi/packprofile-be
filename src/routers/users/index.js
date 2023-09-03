@@ -37,6 +37,8 @@ usersRouter.post('/logout', async (req, res, next) => {
 	try {
 		res.clearCookie('accessToken', {
 			httpOnly: true,
+         sameSite: 'None',
+         secure: true
 		})
 
 		res.status(200).send({ message: 'Successfully logged out' })
