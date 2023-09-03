@@ -1,12 +1,6 @@
 import { Router } from 'express'
 import fs from 'fs/promises'
 import createError from 'http-errors'
-import { JWTAuthenticate } from '../../auth/tools.js'
-import { JWTAuthMiddleware } from '../../auth/middleWares.js'
-import UserModel from '../../models/user/index.js'
-import multer from 'multer'
-import { v2 as cloudinary } from 'cloudinary'
-import { CloudinaryStorage } from 'multer-storage-cloudinary'
 
 const skillsRouter = Router()
 

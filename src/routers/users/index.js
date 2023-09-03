@@ -6,6 +6,7 @@ import UserModel from '../../models/user/index.js'
 import multer from 'multer'
 import { v2 as cloudinary } from 'cloudinary'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
+import { formatHandle, generateHandle } from '../../helpers/user.js'
 
 const usersRouter = Router()
 
@@ -16,15 +17,13 @@ usersRouter.post('/login', async (req, res, next) => {
 
 		if (user) {
 			const accessToken = await JWTAuthenticate(user)
-
 			res.cookie('accessToken', accessToken, {
 				httpOnly: true,
-				// secure: process.env.NODE_ENV === 'production', // set to true if you are using https
 				sameSite: 'strict',
 				maxAge: 3600000,
 			})
 
-			res.send({ userId: user._id })
+			res.send({ user })
 		} else {
 			next(createError(401))
 		}
@@ -33,22 +32,40 @@ usersRouter.post('/login', async (req, res, next) => {
 	}
 })
 
+usersRouter.post('/logout', async (req, res, next) => {
+	try {
+		res.clearCookie('accessToken', {
+			httpOnly: true,
+			sameSite: 'strict',
+		})
+
+		res.status(200).send({ message: 'Successfully logged out' })
+	} catch (error) {
+		next(error)
+	}
+})
+
 usersRouter.post('/register', async (req, res, next) => {
 	try {
 		const newUser = new UserModel(req.body)
+		if (!req.body.handle) {
+			newUser.handle = generateHandle(newUser)
+		}
 		const { _id } = await newUser.save()
 
 		res.status(201).send(_id)
 	} catch (error) {
-		console.log(error)
 		next(createError(500, 'An error occurred while saving new user'))
 	}
 })
 
-usersRouter.get('/', async (req, res, next) => {
+usersRouter.get('/', JWTAuthMiddleware, async (req, res, next) => {
 	try {
-		const users = await UserModel.find()
-		res.status(200).send(users)
+		const count = parseInt(req.query.count) || 10
+		const randomUsers = await UserModel.aggregate([
+			{ $sample: { size: count } },
+		])
+		res.status(200).json(randomUsers)
 	} catch (error) {
 		next(createError(500, { message: error.message }))
 	}
@@ -56,42 +73,28 @@ usersRouter.get('/', async (req, res, next) => {
 
 usersRouter.get('/me', JWTAuthMiddleware, async (req, res, next) => {
 	try {
-		const user = await UserModel.findById(req.user._id).populate([
-			{
-				path: 'course',
-				populate: { path: 'subjects' },
-			},
-			'uni',
-			'availableSubjects',
-		])
+		const user = await UserModel.findById(req.user._id)
 		if (!user) next(createError(404, `ID ${req.params.id} was not found`))
 		else res.status(200).send(user)
 	} catch (error) {
-		next(error)
+		next(createError(500, { message: error.message }))
 	}
 })
 
-usersRouter.get('/:id', async (req, res, next) => {
+usersRouter.get('/:id', JWTAuthMiddleware, async (req, res, next) => {
 	try {
-		const user = await UserModel.findById(req.params.id).populate([
-			'course',
-			'uni',
-			'availableSubjects',
-			{
-				path: 'comments',
-				populate: { path: 'author' },
-			},
-		])
+		const user = await UserModel.findById(req.params.id)
 		if (!user) next(createError(404, `ID ${req.params.id} was not found`))
 		else res.status(200).send(user)
 	} catch (error) {
-		next(error)
+		next(createError(500, { message: error.message }))
 	}
 })
 
 // Update personal info
-usersRouter.put('/info/:id', async (req, res, next) => {
-	const { firstName, lastName, email, handle, position, company, fullTime } = req.body
+usersRouter.put('/info/:id', JWTAuthMiddleware, async (req, res, next) => {
+	const { firstName, lastName, email, handle, position, company, fullTime } =
+		req.body
 	try {
 		await UserModel.findByIdAndUpdate(
 			req.params.id,
@@ -99,24 +102,24 @@ usersRouter.put('/info/:id', async (req, res, next) => {
 				firstName,
 				lastName,
 				email,
-				handle,
+				handle: formatHandle(handle),
 				position,
 				company,
-            fullTime
+				fullTime,
 			},
 			{
 				runValidators: true,
 				new: true,
 			}
 		)
-		res.status(200).send({message: 'Info updated'})
+		res.status(200).send({ message: 'Info updated' })
 	} catch (error) {
-		next(error)
+		next(createError(500, { message: error.message }))
 	}
 })
 
 // Update skills
-usersRouter.put('/skills/:id', async (req, res, next) => {
+usersRouter.put('/skills/:id', JWTAuthMiddleware, async (req, res, next) => {
 	const { skills } = req.body
 	try {
 		await UserModel.findByIdAndUpdate(
@@ -127,14 +130,14 @@ usersRouter.put('/skills/:id', async (req, res, next) => {
 				new: true,
 			}
 		)
-		res.status(200).send({message: 'Skills updated'})
+		res.status(200).send({ message: 'Skills updated' })
 	} catch (error) {
-		next(error)
+		next(createError(500, { message: error.message }))
 	}
 })
 
 // Update bio
-usersRouter.put('/bio/:id', async (req, res, next) => {
+usersRouter.put('/bio/:id', JWTAuthMiddleware, async (req, res, next) => {
 	const { bio } = req.body
 	try {
 		await UserModel.findByIdAndUpdate(
@@ -145,19 +148,9 @@ usersRouter.put('/bio/:id', async (req, res, next) => {
 				new: true,
 			}
 		)
-		res.status(200).send({message: 'Bio updated'})
+		res.status(200).send({ message: 'Bio updated' })
 	} catch (error) {
-		next(error)
-	}
-})
-
-usersRouter.delete('/:id', async (req, res, next) => {
-	try {
-		const deleteUser = await UserModel.findByIdAndDelete(req.params.id)
-		if (deleteUser) res.status(201).send('Profile deleted')
-		else next(createError(400, 'Bad Request'))
-	} catch (error) {
-		next(error)
+		next(createError(500, { message: error.message }))
 	}
 })
 
@@ -172,10 +165,12 @@ const cloudinaryStorage = new CloudinaryStorage({
 
 usersRouter.put(
 	'/imageupload/:id',
+	JWTAuthMiddleware,
 	multer({ storage: cloudinaryStorage }).single('avatar'),
 	async (req, res, next) => {
 		try {
-         const type = req.query.type === 'updateAvatar' ? 'avatar': 'backgroundImg'
+			const type =
+				req.query.type === 'updateAvatar' ? 'avatar' : 'backgroundImg'
 			const user = await UserModel.findByIdAndUpdate(
 				req.params.id,
 				{ [type]: req.file.path },

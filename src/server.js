@@ -1,4 +1,5 @@
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import express from 'express'
 import usersRouter from './routers/users/index.js'
 import skillsRouter from './routers/skills/index.js'
@@ -12,11 +13,11 @@ import {
 
 const server = express()
 
-const whitelist = [process.env.LOCAL_FE]
+const whitelist = [process.env.REACT_APP]
 
 const corsOptions = {
 	origin: function (origin, next) {
-		if (!origin || whitelist.includes(origin)) {
+		if (whitelist.includes(origin)) {
 			next(null, true)
 		} else {
 			next(new Error('Origin is not supported!'))
@@ -26,6 +27,7 @@ const corsOptions = {
 }
 
 server.use(cors(corsOptions))
+server.use(cookieParser())
 server.use(express.json())
 
 server.use('/users', usersRouter)

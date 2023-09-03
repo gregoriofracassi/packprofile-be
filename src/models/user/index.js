@@ -26,11 +26,12 @@ const UserSchema = new mongoose.Schema({
 	},
 	avatar: {
 		type: String,
-		default: 'https://image.flaticon.com/icons/png/512/5173/5173555.png',
+		default: 'https://pbs.twimg.com/media/EWAJB4WUcAAje8s.png',
 	},
-   backgroundImg: {
-      type: String,
-   },
+	backgroundImg: {
+		type: String,
+      default: 'https://wallpaperaccess.com/full/1491561.jpg'
+	},
 	fullTime: {
 		type: Boolean,
 		default: true,
@@ -41,6 +42,12 @@ const UserSchema = new mongoose.Schema({
 	company: {
 		type: String,
 	},
+	city: {
+		type: String,
+	},
+	country: {
+		type: String,
+	},
 	skills: [
 		{
 			type: String,
@@ -48,16 +55,17 @@ const UserSchema = new mongoose.Schema({
 	],
 })
 
+
 UserSchema.pre('save', async function (next) {
 	const newUser = this
 	const plainPw = newUser.password
-
 	if (newUser.isModified('password')) {
 		newUser.password = await bcrypt.hash(plainPw, 10)
 	}
 	next()
 })
 
+// not sending password to client
 UserSchema.methods.toJSON = function () {
 	const user = this
 	const userObject = user.toObject()
