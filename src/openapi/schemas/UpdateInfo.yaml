@@ -1,0 +1,24 @@
+UserInfo:
+   type: object
+   required:
+      - firstName
+      - lastName
+      - handle
+      - country
+   properties:
+      firstName:
+         type: string
+      lastName:
+         type: string
+      handle:
+         type: string
+      country:
+         type: string
+      position:
+         type: string
+      company:
+         type: string
+      city:
+         type: string
+      fullTime:
+         type: boolean
