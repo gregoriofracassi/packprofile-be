@@ -1,0 +1,184 @@
+openapi: 3.0.0
+info:
+   title: User API
+   version: 1.0.0
+paths:
+   /users/login:
+      post:
+         summary: Authenticate a user and return an access token.
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     type: object
+                     properties:
+                        email:
+                           type: string
+                        password:
+                           type: string
+         responses:
+            '200':
+               description: Successfully authenticated.
+            '401':
+               description: Unauthorized.
+
+   /users/logout:
+      post:
+         summary: Log out the current user and remove the access token.
+         responses:
+            '200':
+               description: Successfully logged out.
+
+   /users/register:
+      post:
+         summary: Register a new user.
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     $ref: '../schemas/UserRegister.yaml'
+         responses:
+            '201':
+               description: Successfully registered.
+            '500':
+               description: An error occurred while saving new user.
+
+   /users:
+      get:
+         summary: Retrieve a list of random users.
+         parameters:
+            - name: count
+              in: query
+              schema:
+                 type: integer
+                 description: Number of random users to retrieve
+         responses:
+            '200':
+               description: Successfully retrieved users.
+            '500':
+               description: Server error.
+
+   /users/me:
+      get:
+         summary: Retrieve the current user's information.
+         responses:
+            '200':
+               description: Successfully retrieved user.
+            '404':
+               description: User not found.
+            '500':
+               description: Server error.
+
+   /users/{id}:
+      get:
+         summary: Retrieve information for a specific user by ID.
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: string
+         responses:
+            '200':
+               description: Successfully retrieved user.
+            '404':
+               description: User not found.
+            '500':
+               description: Server error.
+
+   /users/info/{id}:
+      put:
+         summary: Update personal info for a specific user by ID.
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: string
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     $ref: '../schemas/UpdateUserInfo.yaml'
+         responses:
+            '200':
+               description: Successfully retrieved user.
+            '500':
+               description: Server error.
+
+   /users/skills/{id}:
+      put:
+         summary: Update personal info for a specific user by ID.
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: string
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                    $ref: '../schemas/UpdateUserSkills.yaml'
+         responses:
+            '200':
+               description: Successfully retrieved user.
+            '500':
+               description: Server error.
+
+   /users/bio/{id}:
+      put:
+         summary: Update personal info for a specific user by ID.
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: string
+         requestBody:
+            required: true
+            content:
+               application/json:
+                  schema:
+                     $ref: '../schemas/UpdateUserBio.yaml'
+         responses:
+            '200':
+               description: Successfully retrieved user.
+            '500':
+               description: Server error.
+
+   /users/imageupload/{id}:
+      put:
+         summary: Upload an image for a specific user by ID.
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: string
+            - name: type
+              in: query
+              schema:
+                  type: string
+                  enum: ['updateAvatar', 'updateBackgroundImg']
+         requestBody:
+            required: true
+            content:
+               multipart/form-data:
+                  schema:
+                     type: object
+                     properties:
+                        avatar:
+                           type: string
+                           format: binary
+         responses:
+            '200':
+               description: Image successfully uploaded.
+            '404':
+               description: User not found.
+            '500':
+               description: An error occurred while uploading the user avatar.
