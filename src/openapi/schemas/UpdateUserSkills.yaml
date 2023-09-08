@@ -1,10 +1,8 @@
-UserSkills:
-   type: object
-   required:
-      - skills
-   properties:
-      skills:
-         type: array
-         items:
-            type: string
-         minItems: 3
+type: object
+required:
+  - skills
+properties:
+  skills:
+      type: array
+      items:
+        type: string

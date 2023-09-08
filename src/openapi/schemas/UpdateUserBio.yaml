@@ -1,8 +1,7 @@
-UserBio:
-   type: object
-   required:
-      - bio
-   properties:
-      bio:
-         type: string
-         maxLength: 500
+type: object
+required:
+  - bio
+properties:
+  bio:
+      type: string
+      maxLength: 500

@@ -33,9 +33,8 @@ server.use(express.json())
 
 server.use(
 	OpenApiValidator.middleware({
-		apiSpec: './openapi/routes/user.yaml',
+		apiSpec: './src/openapi/routes/user.yaml',
 		validateRequests: true,
-		validateResponses: true,
 	})
 )
 

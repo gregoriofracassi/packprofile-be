@@ -139,7 +139,7 @@ usersRouter.put('/skills/:id', JWTAuthMiddleware, async (req, res, next) => {
 })
 
 // Update bio
-usersRouter.put('/bio/:id', JWTAuthMiddleware, async (req, res, next) => {
+usersRouter.put('/bio/:id', async (req, res, next) => {
 	const { bio } = req.body
 	try {
 		await UserModel.findByIdAndUpdate(
